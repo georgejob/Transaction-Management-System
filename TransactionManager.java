@@ -1,4 +1,3 @@
-
 import java.util.Scanner;
 
 public class TransactionManager 
@@ -9,7 +8,12 @@ public class TransactionManager
 	boolean loyal;
 	String date;
 	private TransactionManager manager;
+	private Account Saccount;
+	private Account Caccount;
+	private Account Maccount;
+	//private AccountDatabase database;
 	
+	AccountDatabase database = new AccountDatabase();
 	
 	public TransactionManager()
 	{
@@ -26,8 +30,8 @@ public class TransactionManager
 	}*/
 	
 	public void run()
-	{
-		System.out.println("Running manager");
+	{	
+		System.out.println("Transaction processing starts.....");
 		boolean transacting = true;
 		while(transacting)
 		{
@@ -46,7 +50,20 @@ public class TransactionManager
 						amount = Float.parseFloat(cmdArray[3]);
 						date = cmdArray[4];
 						loyal = Boolean.parseBoolean(cmdArray[5]);
-						System.out.println("Account opened and added to the database.");
+						
+						String[] dateComponents = date.split("/");
+						Date accountDate = new Date(Integer.parseInt(dateComponents[0]), Integer.parseInt(dateComponents[1]), Integer.parseInt(dateComponents[2]));
+						
+						Checking newChecking = new Checking(new Profile(first,last), amount, accountDate, loyal);
+						
+						if(database.add(newChecking))
+						{
+							System.out.println("Account opened and added to the database.");
+						}
+						else
+						{
+							System.out.println("Account is already in the database.");
+						}
 					}
 					else
 					{
@@ -56,13 +73,26 @@ public class TransactionManager
 				case "OS":
 					if(cmdArray.length == 6)
 					{
-						//Opens savings account with first last amount loyal
+						//Opens checking account with first last amount loyal
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
 						date = cmdArray[4];
 						loyal = Boolean.parseBoolean(cmdArray[5]);
-						System.out.println("Account opened and added to the database.");
+						
+						String[] dateComponents = date.split("/");
+						Date accountDate = new Date(Integer.parseInt(dateComponents[0]), Integer.parseInt(dateComponents[1]), Integer.parseInt(dateComponents[2]));
+						
+						Savings newSavings = new Savings(new Profile(first,last), amount, accountDate, loyal);
+						
+						if(database.add(newSavings))
+						{
+							System.out.println("Account opened and added to the database.");
+						}
+						else
+						{
+							System.out.println("Account is already in the database.");
+						}
 					}
 					else
 					{
@@ -77,8 +107,20 @@ public class TransactionManager
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
 						date = cmdArray[4];
-						loyal = Boolean.parseBoolean(cmdArray[5]);
-						System.out.println("Account opened and added to the database.");
+						
+						String[] dateComponents = date.split("/");
+						Date accountDate = new Date(Integer.parseInt(dateComponents[0]), Integer.parseInt(dateComponents[1]), Integer.parseInt(dateComponents[2]));
+						
+						MoneyMarket newMM = new MoneyMarket(new Profile(first,last), amount, accountDate);
+						
+						if(database.add(newMM))
+						{
+							System.out.println("Account opened and added to the database.");
+						}
+						else
+						{
+							System.out.println("Account is already in the database.");
+						}
 					}
 					else
 					{
@@ -92,7 +134,16 @@ public class TransactionManager
 						first = cmdArray[1];
 						last = cmdArray[2];
 						
-						System.out.println("Account closed and removed from the database.");
+						Checking dummyChecking = new Checking(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						if(database.remove(dummyChecking))
+						{
+							System.out.println("Account closed and removed from the database.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -106,7 +157,16 @@ public class TransactionManager
 						first = cmdArray[1];
 						last = cmdArray[2];
 						
-						System.out.println("Account closed and removed from the database.");
+						Savings dummySavings = new Savings(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						if(database.remove(dummySavings))
+						{
+							System.out.println("Account closed and removed from the database.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -120,7 +180,16 @@ public class TransactionManager
 						first = cmdArray[1];
 						last = cmdArray[2];
 						
-						System.out.println("Account closed and removed from the database.");
+						MoneyMarket dummyMM = new MoneyMarket(new Profile(first,last), amount, new Date(0,0,0));
+						
+						if(database.remove(dummyMM))
+						{
+							System.out.println("Account closed and removed from the database.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -134,7 +203,17 @@ public class TransactionManager
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"Deposited into the account.");
+						
+						Checking dummyChecking = new Checking(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						if(database.deposit(dummyChecking, amount))
+						{
+							System.out.println(amount + " deposited to account.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -148,7 +227,17 @@ public class TransactionManager
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"Deposited into the account.");
+						
+						Savings dummySavings = new Savings(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						if(database.deposit(dummySavings, amount))
+						{
+							System.out.println(amount + " deposited to account.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -158,11 +247,20 @@ public class TransactionManager
 				case "DM":
 					if(cmdArray.length == 4)
 					{
-						//deposit to money market first last amount
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"Deposited into the account.");
+						
+						MoneyMarket dummyMM = new MoneyMarket(new Profile(first,last), amount, new Date(0,0,0));
+						
+						if(database.deposit(dummyMM, amount))
+						{
+							System.out.println(amount + " deposited to account.");
+						}
+						else
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -170,15 +268,29 @@ public class TransactionManager
 					}
 					break;
 				case "WC":
-					if(cmdArray.length == 3)
+					if(cmdArray.length == 4)
 					{
 						//withdraw checing first last amount
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"withdrawn from the account.");
-						//if withdraw is over total account amount
-						System.out.println("Insufficient funds");
+						
+						Checking dummyChecking = new Checking(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						int withdrawResult = database.withdrawal(dummyChecking, amount);
+						if(withdrawResult == 0)
+						{
+							System.out.println(amount + " withdrawn from the account.");
+						}
+						else if(withdrawResult == 1)
+						{
+							//if withdraw is over total account amount
+							System.out.println("Insufficient funds.");
+						}
+						else if(withdrawResult == -1)
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -186,15 +298,28 @@ public class TransactionManager
 					}
 					break;
 				case "WS":
-					if(cmdArray.length == 3)
+					if(cmdArray.length == 4)
 					{
-						//withdraw savings first last amount
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"withdrawn from the account.");
-						//if withdraw is over total account amount
-						System.out.println("Insufficient funds");
+						
+						Savings dummySavings = new Savings(new Profile(first,last), amount, new Date(0,0,0), loyal);
+						
+						int withdrawResult = database.withdrawal(dummySavings, amount);
+						if(withdrawResult == 0)
+						{
+							System.out.println(amount + " withdrawn from the account.");
+						}
+						else if(withdrawResult == 1)
+						{
+							//if withdraw is over total account amount
+							System.out.println("Insufficient funds.");
+						}
+						else if(withdrawResult == -1)
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -202,15 +327,29 @@ public class TransactionManager
 					}
 					break;
 				case "WM":
-					if(cmdArray.length == 3)
+					if(cmdArray.length == 4)
 					{
 						//withdraw money market first last amount'
 						first = cmdArray[1];
 						last = cmdArray[2];
 						amount = Float.parseFloat(cmdArray[3]);
-						System.out.println(/*amount + */"withdrawn from the account.");
-						//if withdraw is over total account amount
-						System.out.println("Insufficient funds");
+						
+						MoneyMarket dummyMM = new MoneyMarket(new Profile(first,last), amount, new Date(0,0,0));
+						
+						int withdrawResult = database.withdrawal(dummyMM, amount);
+						if(withdrawResult == 0)
+						{
+							System.out.println(amount + " withdrawn from the account.");
+						}
+						else if(withdrawResult == 1)
+						{
+							//if withdraw is over total account amount
+							System.out.println("Insufficient funds.");
+						}
+						else if(withdrawResult == -1)
+						{
+							System.out.println("Account does not exist.");
+						}
 					}
 					else
 					{
@@ -219,17 +358,27 @@ public class TransactionManager
 					break;
 				case "PA":
 					//print list of all acounts
-					System.out.println("--Listing accounts in the database--");
-					
-					System.out.println("--end of listing--");
+					if(database.getSize() > 0)
+					{
+						System.out.println("--Listing accounts in the database--");
+						database.printAccounts();
+						System.out.println("--end of listing--");
+					}
+					else
+					{
+						System.out.println("Database is empty.");
+					}
 					break;
 				case "PD":
 					System.out.println("--Printing statements by data opened--");
+					database.printByDateOpen();
 					//calculate list of monthly intrests + fees
 					//print account statements in sorted by opening dates
 					break;
 				case "PN":
 					System.out.println("--Printing statements by last name--");
+					
+					database.printByLastName();
 					//Same as PD, but sorted bt last names in acending order
 					break;
 				case "Q":
